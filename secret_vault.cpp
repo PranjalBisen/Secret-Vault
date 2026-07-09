@@ -78,6 +78,39 @@ void insert_secret(string vault_file_name, BSTNode* &root){
     insert_new_node_in_bst(new_node,root); 
 }
 
+bool vault_exists(string vault_file_name){
+    /*
+    Function to check if there is an existing
+    vault with same name
+    */
+    fstream file(vault_file_name,ios::binary|ios::in);
+    return file.good();
+}
+
+BSTNode* rebuild_bst_from_file(string vault_file_name){
+    /*
+    We already had a bst before we killed the program
+    so now we gotta rebuild the tree from the secret vault
+    */
+    BSTNode* root=nullptr;
+    fstream file(vault_file_name,ios::binary|ios::in);
+    if(!file){
+        cout<<"Error while opening vault for rebuild"<<endl;
+        return root;
+    }
+    SecretRecord record;
+    ll offset=0;
+    while(read_next_record(file,record)){
+        if(!record.is_deleted){
+            BSTNode* new_node=create_new_node(string(record.name),offset);
+            insert_new_node_in_bst(new_node,root);
+        }
+        offset+=sizeof(SecretRecord);
+    }
+    file.close();
+    return root;
+}
+
 void search_secret(string vault_file_name,BSTNode* &root){
     /*
     Another beautiful funciton to encapsulate all 
@@ -129,9 +162,16 @@ void menu(){
     string vault;
     cout<<"What should your vault's name be?"<<endl;
     cin>>vault;
-    create_dat_file(vault);
     string vault_file_name=vault+".dat";
     BSTNode* root=nullptr;
+    if(vault_exists(vault_file_name)){
+        cout<<"Vault found! Recovering BST..."<<endl;
+        root=rebuild_bst_from_file(vault_file_name);
+        cout<<"BST rebuilt successfully"<<endl;
+    }
+    else{
+        create_dat_file(vault);
+    }
     while(true){
     cout<<"Welcome to My Secret Vault"<<endl;
     cout<<"1. Insert Secret"<<endl;

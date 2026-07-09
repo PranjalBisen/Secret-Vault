@@ -131,6 +131,13 @@ void read_all_dat_file(string file_name, SecretRecord secretRecord){
     file.close();
 }
 
+bool read_next_record(fstream& file,SecretRecord& record){
+    /*
+    Literally a oneliner to read next record
+    */
+    return (bool)file.read((char*)&record,sizeof(record));
+}
+
 void read_from_record_number_one_dat_file(string file_name, SecretRecord secretRecord, int index){
     /*
     Function to read exactly one Struct from a file
