@@ -64,13 +64,14 @@ void insert_secret(string vault_file_name, BSTNode* &root){
     logical operations to store a secret in .dat and 
     also in bst
     */
-   string key, secret;
+    string key, secret;
     cout<<"Enter Your Name Bruvvv"<<endl;
-    cin>>key;
-    // getline(cin, key);
+    // cin>>key;
+    cin.ignore();
+    getline(cin,key);
     cout<<"Its time to know your secret"<<endl;
-    cin>>secret;
-    // getline(cin, secret);
+    // cin>>secret;
+    getline(cin,secret);
 
     SecretRecord secretrecord=create_record_helper(key, secret);
     ll current_write_offset=append_dat_file(vault_file_name,secretrecord);
@@ -115,10 +116,13 @@ void search_secret(string vault_file_name,BSTNode* &root){
     /*
     Another beautiful funciton to encapsulate all 
     the search logic : bst -> .dat -> output
+    Now also checks if record is soft deleted
     */
     cout<<"Tell me what you wanna search for"<<endl;
     string key;
-    cin>>key;
+    // cin>>key;
+    cin.ignore();
+    getline(cin,key);
 
     BSTNode* searched_node=search_node_in_bst(key,root);
     if(!searched_node){
@@ -129,7 +133,45 @@ void search_secret(string vault_file_name,BSTNode* &root){
         yes;
         ll searched_offset=searched_node->offset;
         SecretRecord temp;
-        read_from_offset_one_dat_file(vault_file_name,temp,searched_offset);
+        fstream file(vault_file_name,ios::binary|ios::in);
+        file.seekg(searched_offset);
+        file.read((char*)&temp,sizeof(temp));
+        file.close();
+        if(temp.is_deleted){
+            no;
+            cout<<"Sorry bruv we don't have your secret"<<endl;
+        }
+        else{
+            yes;
+            print_secret_record(temp);
+        }
+    }
+}
+
+void delete_secret(string vault_file_name,BSTNode* &root){
+    /*
+    Function to soft delete a secret
+    BST finds offset, then we mark is_deleted=true
+    in the .dat file, BST node stays as is
+    */
+    cout<<"Who's secret do you wanna delete bruv"<<endl;
+    string key;
+    cin.ignore();
+    getline(cin,key);
+
+    BSTNode* searched_node=search_node_in_bst(key,root);
+    if(!searched_node){
+        no;
+        cout<<"No such secret exists bruvvv"<<endl;
+    }
+    else{
+        ll searched_offset=searched_node->offset;
+        if(soft_delete_record(vault_file_name,searched_offset)){
+            cout<<"Secret Deleted Successfully"<<endl;
+        }
+        else{
+            cout<<"Deletion Failed"<<endl;
+        }
     }
 }
 
@@ -161,7 +203,8 @@ void menu(){
     */
     string vault;
     cout<<"What should your vault's name be?"<<endl;
-    cin>>vault;
+    // cin>>vault;
+    getline(cin,vault);
     string vault_file_name=vault+".dat";
     BSTNode* root=nullptr;
     if(vault_exists(vault_file_name)){
@@ -176,8 +219,9 @@ void menu(){
     cout<<"Welcome to My Secret Vault"<<endl;
     cout<<"1. Insert Secret"<<endl;
     cout<<"2. Search Secret"<<endl;
-    cout<<"3. Print all Secrets like a madman"<<endl;
-    cout<<"4. I'm a loser, Byeeee"<<endl;
+    cout<<"3. Delete Secret"<<endl;
+    cout<<"4. Print all Secrets like a madman"<<endl;
+    cout<<"5. I'm a loser, Byeeee"<<endl;
 
     int choose;
     cin>>choose;
@@ -189,10 +233,13 @@ void menu(){
         search_secret(vault_file_name,root);
     }
     else if(choose==3){
+        delete_secret(vault_file_name,root);
+    }
+    else if(choose==4){
         SecretRecord temp;
         read_all_dat_file(vault_file_name,temp);
     }
-    else if(choose==4){
+    else if(choose==5){
         cout<<"Bye loseerrrr"<<endl;
         break;
     }

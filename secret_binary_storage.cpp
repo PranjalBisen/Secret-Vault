@@ -138,6 +138,26 @@ bool read_next_record(fstream& file,SecretRecord& record){
     return (bool)file.read((char*)&record,sizeof(record));
 }
 
+bool soft_delete_record(string file_name,int offset){
+    /*
+    Soft deletes a record by setting is_deleted=true
+    at the given offset, record stays physically
+    */
+    fstream file(file_name,ios::binary|ios::in|ios::out);
+    if(!file){
+        cout<<"Error while opening file for soft delete"<<endl;
+        return false;
+    }
+    SecretRecord record;
+    file.seekg(offset);
+    file.read((char*)&record,sizeof(record));
+    record.is_deleted=true;
+    file.seekp(offset);
+    file.write((char*)&record,sizeof(record));
+    file.close();
+    return true;
+}
+
 void read_from_record_number_one_dat_file(string file_name, SecretRecord secretRecord, int index){
     /*
     Function to read exactly one Struct from a file

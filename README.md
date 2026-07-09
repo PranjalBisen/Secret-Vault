@@ -44,3 +44,21 @@
 - O(log n) lookup through BST
 - Offset-based record retrieval from binary file
 - Interactive CLI menu
+
+### Vault Persistence
+
+- Vault file existence check before creation
+- BST rebuild from existing `.dat` file on startup
+- Sequential record reading using `read_next_record()`
+- Skips deleted records during rebuild
+- No data loss between sessions
+
+### Soft Delete
+
+- `soft_delete_record()` marks record as deleted in `.dat`
+- Record stays physically, `is_deleted` flag set to `true`
+- Search validates record from `.dat` before printing
+- Stale BST entries treated as not found
+- `read_all_dat_file()` skips deleted records
+- Deletion persists across restarts
+- `getline()` support for multi-word input

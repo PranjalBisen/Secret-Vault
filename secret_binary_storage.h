@@ -14,10 +14,12 @@ struct SecretRecord{
     bool is_deleted;
 };
 
+void print_secret_record(SecretRecord);
 void create_dat_file(string);
 long long append_dat_file(string, SecretRecord);
 void read_all_dat_file(string, SecretRecord);
 bool read_next_record(fstream&,SecretRecord&);
+bool soft_delete_record(string,int);
 void read_from_record_number_one_dat_file(string, SecretRecord, int);
 void read_from_offset_one_dat_file(string, SecretRecord, int);
 
