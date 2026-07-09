@@ -26,3 +26,17 @@ records vs offset reading, and just a lot about appending, creating, reading.
 
 Also loved the concept of ios::binary, ios::in, ios::out, ios::app, and 
 how storing a fixed size record beautifully optimizes random access of records.
+
+
+Phase III: Storage Engine Integration
+
+Initially both modules worked independently.
+
+Binary Storage knew nothing about BST.
+
+BST knew nothing about .dat.
+
+The biggest learning in this phase was connecting multiple independent modules
+into a complete storage engine.
+
+Now the broken pieces have come together, looking beautiful nonetheless

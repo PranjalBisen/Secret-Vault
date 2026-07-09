@@ -12,3 +12,6 @@ wheels/
 Secret.dat
 bloom
 file
+vault
+*.dat
+bst
