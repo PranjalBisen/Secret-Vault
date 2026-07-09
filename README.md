@@ -24,3 +24,23 @@
 - `tellg()`, `tellp()`
 - `seekg()`
 - Soft delete flag support
+
+### Binary Search Tree Index
+
+- Custom BST implementation
+- Create BST node
+- Recursive insertion
+- Recursive search
+- Inorder traversal
+- Preorder traversal
+- Postorder traversal
+- Offset-based indexing
+
+### Storage Engine Integration
+
+- Binary storage integrated with BST index
+- Offset returned after record insertion
+- Offset stored inside BST nodes
+- O(log n) lookup through BST
+- Offset-based record retrieval from binary file
+- Interactive CLI menu

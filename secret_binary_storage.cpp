@@ -45,113 +45,6 @@ const ld EPS = 1e-9;
 #define TESTS int t; cin >> t; while(t--) solve();
 #define mem(x, v) memset(x, v, sizeof(x))
 
-// Sieve of Eratosthenes and Smallest Prime Factor (SPF)
-vector<ll> sieve(N_sieve, 1);
-vector<ll> spf(N_sieve + 1, 1e9);
-void sieveoe() {
-    for (ll i = 0; i < spf.size(); i++) {
-        spf[i] = i;
-    }
-    sieve[0] = 0;
-    sieve[1] = 0;
-    for (ll i = 2; i * i <= N_sieve; i++) {
-        if (sieve[i]) {
-            spf[i] = min(spf[i], i);
-            for (ll j = i * i; j <= N_sieve; j += i) {
-                sieve[j] = 0;
-                spf[j] = min(spf[j], i);
-            }
-        }
-    }
-}
-
-// Factorial and Modular Factorial
-ll factorial(ll n) {
-    ll ans = 1;
-    for (ll i = 1; i <= n; i++) {
-        ans *= i;
-    }
-    return ans;
-}
-
-ll mul_mod(ll a, ll b, ll modulo) {
-    return ((a % modulo) * (b % modulo)) % modulo;
-}
-
-ll factorial_with_mod(ll n, ll modulo) {
-    ll ans = 1;
-    for (ll i = 1; i <= n; i++) {
-        ans = mul_mod(ans, i, modulo);
-    }
-    return ans % modulo;
-}
-
-// GCD, LCM, and Modular Inverse
-ll gcd(ll a, ll b) {
-    return b ? gcd(b, a % b) : a;
-}
-
-ll lcm(ll a, ll b) {
-    return (a * b) / gcd(a, b);
-}
-
-ll mod_inverse(ll a, ll mod = MOD) {
-    ll res = 1, b = mod - 2;
-    while (b) {
-        if (b & 1) res = res * a % mod;
-        a = a * a % mod;
-        b >>= 1;
-    }
-    return res;
-}
-
-// Power of 2 Check
-bool powerof2(ll x) {
-    return !(x & (x - 1));
-}
-
-// MSB and One's Complement
-ll msb(ll n) {
-    ll ans = 0;
-    n = (n >> 1);
-    while (n) {
-        n = (n >> 1);
-        ans++;
-    }
-    return ans;
-}
-
-int onesComplement(int n) {
-    int number_of_bits = floor(log2(n)) + 1;
-    return ((1 << number_of_bits) - 1) ^ n;
-}
-
-// nCr Function (Combinatorial)
-int nCr(int n, int r) {
-    if (r > n) return 0;
-    if (r == 0 || r == n) return 1;
-    return nCr(n - 1, r - 1) + nCr(n - 1, r);
-}
-
-// String Utility Functions
-string to_upper(string s) {
-    transform(all(s), s.begin(), ::toupper);
-    return s;
-}
-
-string to_lower(string s) {
-    transform(all(s), s.begin(), ::tolower);
-    return s;
-}
-
-bool is_palindrome(const string &s) {
-    return equal(s.begin(), s.begin() + s.size()/2, s.rbegin());
-}
-
-// Comparator Function for Sorting Pairs by Sum
-static bool compsum(pii a, pii b) {
-    return (a.first + a.second < b.first + b.second);
-}
 
 struct SecretRecord{
     /*
@@ -195,22 +88,24 @@ void create_dat_file(string s){
     created_file.close();
 }
 
-void append_dat_file(string file_name, SecretRecord secretRecord){
+ll append_dat_file(string file_name, SecretRecord secretRecord){
     /*
     Here we have written code to append value at the end of file
     */
-   fstream file(file_name, ios::binary|ios::out|ios::app);
-   if(!file){
+    fstream file(file_name, ios::binary|ios::out|ios::app);
+    if(!file){
         no;
         cout<<"Error while creating file"<<endl;
-        return ;
+        return -1;
     }
-   print_current_write_offset(file);
+    print_current_write_offset(file);
+    ll current_write_offset=file.tellp();
     file.write((char*)&secretRecord,sizeof(secretRecord));
     print_current_write_offset(file);
     cout<<"Data Appended Successfully"<<endl;
     cout<<"Size of Struct: "<<sizeof(secretRecord)<<endl;
     file.close();
+    return current_write_offset;
 }
 
 void read_all_dat_file(string file_name, SecretRecord secretRecord){
@@ -320,8 +215,8 @@ tellg() -> Current read offset.
 seekp() -> Move the write offset.
 seekg() -> Move the read offset.
 */
-int main() {
-    fast_io;
-    // test_file_handling();
-    return 0;
-}
+// int main() {
+//     fast_io;
+//     // test_file_handling();
+//     return 0;
+// }
