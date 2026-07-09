@@ -84,3 +84,62 @@ from cin>>choose. Classic C++ gotcha that got me good initially.
 
 Rebuild already skipped deleted records from Phase IV so nothing to change there.
 That felt satisfying, past me was looking out for future me.
+
+
+Phase VI: Authorization
+
+This is where the project started feeling real.
+
+Before this, anyone could open any vault just by typing the name.
+That's not a vault, that's a folder with extra steps.
+
+So now when you create a new vault it asks for a password, hashes it
+using our own polynomial rolling hash, and stores the hash inside a .meta file.
+Not inside the .dat, because .dat stores records and .meta stores vault info.
+Exactly how real databases separate metadata from data.
+
+The beautiful part is I didn't use SHA256 or OpenSSL or bcrypt or any external lib.
+I used the same polynomial rolling hash I wrote in Phase I for bloom filter.
+That hash function finally has two jobs now.
+
+To make that work I had to extract all the hash functions out of
+secret_bloom_filter.cpp and put them in a shared secret_hash_utils.cpp.
+Now both bloom filter and auth import from the same place, zero duplicate code.
+
+Also wrote hash_polynomial_raw() which is the same polynomial rolling hash
+but returns the full ll value without modding by array size. Because for password
+hashing we want the actual hash value not a bucket index. Small difference,
+but it matters.
+
+Wrong password? Get outta here. Right password? Welcome back bruv.
+
+
+Phase VII: Bloom Filter Integration
+
+This might be my favourite phase because it made everything click.
+
+Before this, bloom filter was just sitting there doing nothing.
+I built it in Phase I, learned all about it, and then it just existed.
+Now it has an actual job.
+
+Insert flow now goes through bloom first. If bloom says definitely not present
+we skip straight to insert, no BST search needed. If bloom says maybe present
+then we check BST to confirm. If actually duplicate, reject. This is exactly
+how production systems reduce unnecessary index lookups.
+
+Search does the same thing. Bloom says definitely not present? Return immediately.
+Don't even touch BST. Bloom says maybe? Then go through BST and .dat as usual.
+
+Delete doesn't touch bloom at all. Because bloom filters can't delete.
+That's why counting bloom filters exist. But we don't need that here.
+Bloom can have stale entries after soft delete, and that's perfectly fine
+because bloom filters are probabilistic by nature. 
+
+The coolest part was the rebuild. When the vault restarts, we read every record
+from .dat and in the same single pass we rebuild both BST and bloom filter.
+One read, two structures rebuilt. That felt clean.
+
+Now every component has a real job.
+Metadata handles auth. Bloom handles fast negative lookups.
+BST handles exact indexing. .dat handles persistent storage.
+Everything has a purpose. Nothing is wasted.

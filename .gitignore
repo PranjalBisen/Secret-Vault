@@ -14,4 +14,5 @@ bloom
 file
 vault
 *.dat
+*.meta
 bst
